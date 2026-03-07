@@ -2,42 +2,55 @@ import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
 import { DynamicColorIOS } from 'react-native';
 
 import { Colors } from '@/constants/theme';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemedView } from '@/components/themed-view';
 
 export default function TabLayout() {
   return (
-    <NativeTabs
-      minimizeBehavior="onScrollDown"
-      labelStyle={{
-        color: DynamicColorIOS({
-          dark: Colors.dark.text,
-          light: Colors.light.text,
-        }),
-      }}
-      tintColor={DynamicColorIOS({
-        dark: Colors.dark.tint,
-        light: Colors.light.tint,
-      })}
-    >
-      <NativeTabs.Trigger name="index">
-        <Label>Home</Label>
-        <Icon sf="house.fill" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="discover">
-        <Label>Discover</Label>
-        <Icon sf="safari" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="map">
-        <Label>Map</Label>
-        <Icon sf="map" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="achievements">
-        <Label>Achievements</Label>
-        <Icon sf="trophy.fill" />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile">
-        <Label>Profile</Label>
-        <Icon sf="person.fill" />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <SafeAreaProvider style={{
+      backgroundColor: DynamicColorIOS({
+        dark: Colors.dark.background,
+        light: Colors.light.background,
+      })
+    }}>
+      <NativeTabs
+        minimizeBehavior="onScrollDown"
+        backgroundColor={DynamicColorIOS({
+          dark: Colors.dark.background,
+          light: Colors.light.background,
+        })}
+        labelStyle={{
+          color: DynamicColorIOS({
+            dark: Colors.dark.text,
+            light: Colors.light.text,
+          }),
+        }}
+        tintColor={DynamicColorIOS({
+          dark: Colors.dark.tint,
+          light: Colors.light.tint,
+        })}
+      >
+        <NativeTabs.Trigger name="index">
+          <Label>Home</Label>
+          <Icon sf={{ default: 'house', selected: 'house.fill' }} />
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="discover">
+          <Label>Discover</Label>
+          <Icon sf={{ default: 'safari', selected: 'safari.fill' }} />
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="profile">
+          <Label>Profile</Label>
+          <Icon sf={{ default: 'person', selected: 'person.fill' }} />
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="roulette" role="search">
+          <Label>Roulette</Label>
+          <Icon sf={{ default: 'dice', selected: 'dice.fill' }} />
+        </NativeTabs.Trigger>
+
+      </NativeTabs>
+    </SafeAreaProvider>
   );
 }
