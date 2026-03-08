@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import RNMapView, { Marker } from 'react-native-maps';
+import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
+import { hawkerCenters, locations, stalls } from '@/lib/mock-data';
 
 type DiscoverView = 'feed' | 'map';
 
@@ -73,14 +76,49 @@ function FeedView() {
   );
 }
 
+const SINGAPORE_REGION = {
+  latitude: 1.28,
+  longitude: 103.845,
+  latitudeDelta: 0.02,
+  longitudeDelta: 0.02,
+};
+
 function MapView() {
+  const router = useRouter();
+  const locById = useMemo(() => new Map(locations.map((l) => [l.id, l])), []);
+  const hcById = useMemo(() => new Map(hawkerCenters.map((hc) => [hc.id, hc])), []);
+
+  const markers = useMemo(() => {
+    return stalls.map((stall) => {
+      const loc = locById.get(stall.locationId);
+      const hc = hcById.get(stall.hawkerCenterId);
+      return {
+        id: stall.id,
+        stall,
+        title: stall.name,
+        subtitle: hc?.name,
+        latitude: loc?.latitude ?? SINGAPORE_REGION.latitude,
+        longitude: loc?.longitude ?? SINGAPORE_REGION.longitude,
+      };
+    });
+  }, [locById, hcById]);
+
   return (
-    <View style={styles.mapPlaceholder}>
-      <ThemedText type="defaultSemiBold">Map</ThemedText>
-      <ThemedText type="default" style={styles.placeholder}>
-        Map view coming soon.
-      </ThemedText>
-    </View>
+    <RNMapView
+      style={styles.map}
+      initialRegion={SINGAPORE_REGION}
+      showsUserLocation
+    >
+      {markers.map((m) => (
+        <Marker
+          key={m.id}
+          coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+          title={m.title}
+          description={m.subtitle}
+          onCalloutPress={() => router.push(`/stall/${m.stall.id}`)}
+        />
+      ))}
+    </RNMapView>
   );
 }
 
@@ -112,11 +150,9 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 8,
   },
-  mapPlaceholder: {
+  map: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+    width: '100%',
   },
   placeholder: {
     opacity: 0.5,

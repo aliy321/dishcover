@@ -14,7 +14,7 @@ export default function TabLayout() {
       })
     }}>
       <NativeTabs
-        minimizeBehavior="onScrollDown"
+        minimizeBehavior="automatic"
         backgroundColor={DynamicColorIOS({
           dark: Colors.dark.background,
           light: Colors.light.background,
@@ -31,13 +31,13 @@ export default function TabLayout() {
         })}
       >
         <NativeTabs.Trigger name="index">
-          <Label>Home</Label>
-          <Icon sf={{ default: 'house', selected: 'house.fill' }} />
+          <Label>Dishcover</Label>
+          <Icon sf={{ default: 'fork.knife', selected: 'fork.knife' }} />
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="discover">
-          <Label>Discover</Label>
-          <Icon sf={{ default: 'safari', selected: 'safari.fill' }} />
+          <Label>Explore</Label>
+          <Icon sf={{ default: 'map', selected: 'map.fill' }} />
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="profile">

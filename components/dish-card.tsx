@@ -1,8 +1,9 @@
 import { Link } from 'expo-router';
-import { Image, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { DynamicColorIOS, Image, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import type { Dish } from '@/types';
+import { Colors } from '@/constants/theme';
 
 const FALLBACK_IMAGE = require('@/assets/food.jpg');
 
@@ -40,7 +41,10 @@ const styles = StyleSheet.create({
     width: CARD_WIDTH,
     borderRadius: 24,
     overflow: 'hidden',
-    backgroundColor: 'rgba(128,128,128,0.2)',
+    backgroundColor: DynamicColorIOS({
+      dark: Colors.dark.card,
+      light: Colors.light.card,
+    }),
     // Depth: shadow (iOS) + elevation (Android)
     ...Platform.select({
       ios: {

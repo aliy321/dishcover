@@ -87,51 +87,8 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
         
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="location" size={22} color={iconColor} />
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Nearby hawkers</ThemedText>
-          </View>
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalContent}
-          >
-            {nearbyStalls.map(({ stall, hawkerCenterName }) => (
-              <StallCard
-                key={stall.id}
-                stall={stall}
-                hawkerCenterName={hawkerCenterName}
-                distance={`${150 + Math.floor(Math.random() * 400)}m`}
-              />
-            ))}
-          </ScrollView>
-        </View>
-        
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Ionicons name="location" size={22} color={iconColor} />
-            <ThemedText type="subtitle" style={styles.sectionTitle}>Nearby hawkers</ThemedText>
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalContent}
-          >
-            {nearbyStalls.map(({ stall, hawkerCenterName }) => (
-              <StallCard
-                key={stall.id}
-                stall={stall}
-                hawkerCenterName={hawkerCenterName}
-                distance={`${150 + Math.floor(Math.random() * 400)}m`}
-              />
-            ))}
-          </ScrollView>
-        </View>
-
-      </ThemedView >
+      </ThemedView>
     </ScrollView>
   );
 }
