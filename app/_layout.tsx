@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { SplashFontGate } from '@/components/splash-font-gate';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -23,14 +24,19 @@ export default function RootLayout() {
       <HeroUINativeProvider>
         <SafeAreaProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }}  />
-              <Stack.Screen name="dish/[id]" options={{ headerShown: false, }} />
-              <Stack.Screen name="dish/[id]/reviews" options={{ headerShown: false }} />
-              <Stack.Screen name="stall/[id]" options={{ headerShown: false }} />
-              <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-            </Stack>
-            <StatusBar style="auto" />
+            <SplashFontGate>
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="dish/[id]" options={{ headerShown: false }} />
+                <Stack.Screen name="dish/[id]/reviews" options={{ headerShown: false }} />
+                <Stack.Screen name="stall/[id]" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="modal"
+                  options={{ presentation: 'modal', title: 'Modal' }}
+                />
+              </Stack>
+              <StatusBar style="auto" />
+            </SplashFontGate>
           </ThemeProvider>
         </SafeAreaProvider>
       </HeroUINativeProvider>

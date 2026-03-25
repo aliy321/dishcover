@@ -17,10 +17,19 @@ export function ThemedText({
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
+  // Gate guarantees Inter fonts are available before first render.
+  const fontFamily =
+    type === 'defaultSemiBold'
+      ? 'Inter_600SemiBold'
+      : type === 'title' || type === 'subtitle'
+        ? 'Inter_700Bold'
+        : 'Inter_400Regular';
+
   return (
     <Text
       style={[
         { color },
+        { fontFamily },
         type === 'default' ? styles.default : undefined,
         type === 'title' ? styles.title : undefined,
         type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
