@@ -78,7 +78,7 @@ export default function SearchScreen() {
             <View style={styles.section}>
               <ThemedText type="defaultSemiBold" style={styles.sectionLabel}>Dishes</ThemedText>
               {matchedDishes.map((dish) => (
-                <DishCard key={dish.id} dish={dish} distance="—" />
+                <DishCard key={dish.id} dish={dish} />
               ))}
             </View>
           )}
@@ -91,7 +91,6 @@ export default function SearchScreen() {
                   key={stall.id}
                   stall={stall}
                   hawkerCenterName={hawkerCenterName}
-                  distance={`${stall.driveTimeMinutes} min`}
                 />
               ))}
             </View>

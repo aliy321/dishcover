@@ -1,5 +1,7 @@
 import type {
   Badge,
+  DishListing,
+  DishType,
   Dish,
   HawkerCenter,
   Location,
@@ -104,7 +106,79 @@ export const dishes: Dish[] = [
     tags: ['dim sum', 'pork', 'steamed', 'snack'],
     stallIds: ['stall-4'],
   },
+  {
+    id: 'd-7',
+    name: 'Chicken Rice',
+    description: 'Roasted chicken with fragrant rice and a richer, caramelized skin finish.',
+    rating: 4.5,
+    reviewCount: 210,
+    price: '$4.50',
+    photoUri: null,
+    tags: ['rice', 'chicken', 'roasted'],
+    stallIds: ['stall-3'],
+  },
+  {
+    id: 'd-8',
+    name: 'Laksa',
+    description: 'Peppery laksa broth with clams and fishcake, less coconut-heavy style.',
+    rating: 4.4,
+    reviewCount: 175,
+    price: '$4.80',
+    photoUri: null,
+    tags: ['noodles', 'spicy', 'seafood'],
+    stallIds: ['stall-4'],
+  },
+  {
+    id: 'd-9',
+    name: 'Char Kway Teow',
+    description: 'Sweeter style char kway teow with extra lup cheong and crunchy bean sprouts.',
+    rating: 4.2,
+    reviewCount: 130,
+    price: '$5',
+    photoUri: null,
+    tags: ['noodles', 'wok hei', 'smoky'],
+    stallIds: ['stall-2'],
+  },
 ];
+
+// ─── Dish Types + Listings (grouped food model) ─────────────────────────────
+
+function slugifyDishName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+export const dishTypes: DishType[] = Array.from(
+  dishes.reduce((acc, dish) => {
+    const slug = slugifyDishName(dish.name);
+    if (!acc.has(slug)) {
+      acc.set(slug, {
+        id: `dt-${slug}`,
+        slug,
+        name: dish.name,
+        aliases: dish.tags,
+        heroPhotoUri: dish.photoUri,
+      });
+    }
+    return acc;
+  }, new Map<string, DishType>()).values(),
+);
+
+export const dishListings: DishListing[] = dishes.flatMap((dish) =>
+  dish.stallIds.map((stallId, index) => ({
+    id: `dl-${dish.id}-${index + 1}`,
+    dishTypeId: `dt-${slugifyDishName(dish.name)}`,
+    dishId: dish.id,
+    stallId,
+    name: dish.name,
+    rating: dish.rating,
+    reviewCount: dish.reviewCount,
+    price: dish.price,
+    photoUri: dish.photoUri,
+  })),
+);
 
 // ─── Stalls ──────────────────────────────────────────────────────────────────
 
@@ -154,7 +228,7 @@ export const stalls: Stall[] = [
       { name: 'Makan Culture Winner', year: 2025, icon: '🏆' },
     ],
     driveTimeMinutes: 7,
-    dishIds: ['d-1'],
+    dishIds: ['d-1', 'd-9'],
   },
   {
     id: 'stall-3',
@@ -178,7 +252,7 @@ export const stalls: Stall[] = [
       { name: 'SingTel Hawker Heroes', year: 2023, icon: '🦸' },
     ],
     driveTimeMinutes: 12,
-    dishIds: ['d-4'],
+    dishIds: ['d-4', 'd-7'],
   },
   {
     id: 'stall-4',
@@ -198,7 +272,7 @@ export const stalls: Stall[] = [
     openingTime: '7:00 AM',
     closingTime: '12:00 PM',
     driveTimeMinutes: 9,
-    dishIds: ['d-5', 'd-6'],
+    dishIds: ['d-5', 'd-6', 'd-8'],
   },
   {
     id: 'stall-5',
@@ -393,6 +467,44 @@ export function getStallById(id: string): Stall | undefined {
 
 export function getDishById(id: string): Dish | undefined {
   return dishes.find((d) => d.id === id);
+}
+
+export function getDishTypeBySlug(slug: string): DishType | undefined {
+  return dishTypes.find((dt) => dt.slug === slug);
+}
+
+export function getListingsForDishType(dishTypeId: string): DishListing[] {
+  return dishListings
+    .filter((listing) => listing.dishTypeId === dishTypeId)
+    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount);
+}
+
+export function getDishTypeSlugForDishId(dishId: string): string | undefined {
+  const dish = getDishById(dishId);
+  if (!dish) return undefined;
+  return slugifyDishName(dish.name);
+}
+
+export function getDishTypeSlugForQuery(query: string): string | undefined {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return undefined;
+
+  const exact = dishTypes.find(
+    (dt) =>
+      dt.slug === normalized ||
+      dt.name.toLowerCase() === normalized ||
+      dt.aliases?.some((alias) => alias.toLowerCase() === normalized),
+  );
+  if (exact) return exact.slug;
+
+  const partial = dishTypes.find(
+    (dt) =>
+      dt.slug.includes(normalized) ||
+      normalized.includes(dt.slug) ||
+      dt.name.toLowerCase().includes(normalized) ||
+      normalized.includes(dt.name.toLowerCase()),
+  );
+  return partial?.slug;
 }
 
 export function getHawkerCenterById(id: string): HawkerCenter | undefined {

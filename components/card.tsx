@@ -10,6 +10,7 @@ export const CARD_HEIGHT = 280;
 export interface CardProps {
   source?: ImageSource;
   backgroundColor?: string;
+  elevated?: boolean;
   width?: number;
   height?: number;
   href?: string;
@@ -21,6 +22,7 @@ export interface CardProps {
 export function Card({
   source,
   backgroundColor = '#111',
+  elevated = true,
   width = CARD_WIDTH,
   height = CARD_HEIGHT,
   href,
@@ -28,7 +30,11 @@ export function Card({
   sharedTransitionTag,
   children,
 }: CardProps) {
-  const cardStyle = [styles.card, { width, height, backgroundColor }] as any;
+  const cardStyle = [
+    styles.card,
+    !elevated && styles.cardFlat,
+    { width, height, backgroundColor },
+  ] as any;
   const pressableStyle = ({ pressed }: { pressed: boolean }) => [
     cardStyle,
     pressed && styles.pressed,
@@ -69,6 +75,9 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     overflow: 'hidden',
     boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
+  },
+  cardFlat: {
+    boxShadow: undefined,
   },
   pressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
   gradient: {

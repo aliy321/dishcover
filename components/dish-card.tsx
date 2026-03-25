@@ -11,14 +11,17 @@ const FALLBACK_IMAGE = require('@/assets/food.jpg');
 
 interface DishCardProps {
   dish: Dish;
-  distance?: string;
+  attribution?: string;
+  href?: string;
 }
 
-export function DishCard({ dish, distance }: DishCardProps) {
+export function DishCard({ dish, attribution, href }: DishCardProps) {
   const source = dish.photoUri ? { uri: dish.photoUri } : FALLBACK_IMAGE;
+  const target = href ?? (`/dish/${dish.id}` as const);
+  const byline = attribution ? `By ${attribution}` : null;
 
   return (
-    <Link href={`/dish/${dish.id}` as any} asChild>
+    <Link href={target as any} asChild>
       <Pressable
         style={({ pressed }) => [
           styles.pressable,
@@ -46,10 +49,15 @@ export function DishCard({ dish, distance }: DishCardProps) {
             <Card.Title className="text-[17px] font-bold leading-[22px] text-white" numberOfLines={2}>
               {dish.name}
             </Card.Title>
+            {byline ? (
+              <Card.Description className="text-xs text-white/70" numberOfLines={1}>
+                {byline}
+              </Card.Description>
+            ) : null}
             <View className="flex-row items-center gap-1">
               <Image source="sf:star.fill" style={styles.starIcon} tintColor="#FFD700" />
               <Card.Description className="text-xs text-white/70">
-                {dish.rating} · {distance ?? `${dish.reviewCount} reviews`}
+                {dish.rating} stars
               </Card.Description>
             </View>
           </Card.Body>

@@ -15,15 +15,17 @@ interface FeaturedDishCardProps {
   contextLine: string;
   width?: number;
   disabled?: boolean;
+  href?: string;
 }
 
-export function FeaturedDishCard({ dish, contextLine, width, disabled }: FeaturedDishCardProps) {
+export function FeaturedDishCard({ dish, contextLine, width, disabled, href }: FeaturedDishCardProps) {
   const { width: screenWidth } = useWindowDimensions();
   const cardWidth = width ?? screenWidth - 32;
   const source = dish.photoUri ? { uri: dish.photoUri } : FALLBACK_IMAGE;
+  const target = href ?? (`/dish/${dish.id}` as const);
 
   return (
-    <Link href={`/dish/${dish.id}`} asChild style={styles.card}>
+    <Link href={target as any} asChild style={styles.card}>
       <Pressable
         disabled={disabled}
         style={({ pressed }) => [styles.card, { width: cardWidth }, pressed && !disabled && styles.pressed]}

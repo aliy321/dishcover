@@ -2,14 +2,20 @@ import { useMemo, useRef, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DishCard } from '@/components/dish-card';
 import { FeaturedDishCard } from '@/components/featured-dish-card';
+import { HomeLocationHeader } from '@/components/home-location-header';
+import { HorizontalScrollSection } from '@/components/horizontal-scroll-section';
 import { StallCard } from '@/components/stall-card';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeColor } from '@/hooks/use-theme-color';
-import { dishes, hawkerCenters, stalls } from '@/lib/mock-data';
+import {
+  dishes,
+  getDishTypeSlugForQuery,
+  hawkerCenters,
+  stalls,
+} from '@/lib/mock-data';
 import type { Dish } from '@/types';
 
 const FOOD_IMAGE = require('@/assets/food.jpg');
@@ -33,10 +39,12 @@ function EmptyRow() {
 interface FoodTileProps {
   dish: Dish;
   subtitle: string;
+  attribution?: string;
 }
 
-function FoodTile({ dish, subtitle }: FoodTileProps) {
+function FoodTile({ dish, subtitle, attribution }: FoodTileProps) {
   const source = dish.photoUri ? { uri: dish.photoUri } : FOOD_IMAGE;
+  const byline = attribution ? `By ${attribution}` : undefined;
 
   return (
     <Link href={`/dish/${dish.id}` as any} asChild>
@@ -45,6 +53,15 @@ function FoodTile({ dish, subtitle }: FoodTileProps) {
         <ThemedText style={styles.foodTileTitle} numberOfLines={1}>
           {dish.name}
         </ThemedText>
+        {byline ? (
+          <ThemedText
+            style={styles.foodTileByline}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {byline}
+          </ThemedText>
+        ) : null}
         <ThemedText style={styles.foodTileMeta} numberOfLines={1}>
           {subtitle}
         </ThemedText>
@@ -54,10 +71,8 @@ function FoodTile({ dish, subtitle }: FoodTileProps) {
 }
 
 export default function HomeScreen() {
-  const tint = useThemeColor({}, 'tint');
   const background = useThemeColor({}, 'background');
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
   const heroCardWidth = Math.max(280, screenWidth - 32);
   const heroSnapInterval = heroCardWidth + 12;
@@ -104,6 +119,14 @@ export default function HomeScreen() {
         .slice(0, 4),
     [],
   );
+  const primaryStallNameByDishId = useMemo(() => {
+    const map = new Map<string, string>();
+    dishes.forEach((dish) => {
+      const primaryStall = dish.stallIds[0] ? stallById.get(dish.stallIds[0]) : undefined;
+      if (primaryStall) map.set(dish.id, primaryStall.name);
+    });
+    return map;
+  }, [stallById]);
 
   return (
     <ScrollView
@@ -112,21 +135,10 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
       contentInsetAdjustmentBehavior='automatic'
     >
-      <View style={styles.topHeader}>
-        <View style={styles.topBarRow}>
-          <Pressable style={styles.locationRow} onPress={() => router.push('/map')}>
-            <Image source="sf:mappin.and.ellipse" style={styles.locationIcon} tintColor={tint} />
-            <ThemedText style={styles.locationLabel}>Near Maxwell, Singapore</ThemedText>
-            <Image source="sf:chevron.down" style={styles.locationChevron} tintColor={tint} />
-          </Pressable>
-          {/* <Pressable style={styles.profileButton} onPress={() => router.push('/profile')}>
-            <Image source="sf:person.crop.circle.fill" style={styles.profileIcon} tintColor={tint} />
-          </Pressable> */}
-        </View>
-      </View>
+      <HomeLocationHeader />
 
       <View style={styles.section}>
-        <ThemedText style={styles.sectionTitleStandalone}>Dish picks today</ThemedText>
+        <ThemedText type="title" style={styles.sectionTitleStandalone}>Dish picks today</ThemedText>
         {featuredCarouselItems.length > 0 ? (
           <>
             <ScrollView
@@ -189,75 +201,86 @@ export default function HomeScreen() {
         )}
       </View>
 
-      <View style={styles.section}>
-        <Pressable style={styles.sectionHeader} onPress={() => router.push('/search')}>
-          <Image source="sf:square.grid.2x2.fill" style={styles.sectionIcon} tintColor={tint} />
-          <ThemedText style={styles.sectionTitle}>Explore categories</ThemedText>
-          <View style={styles.spacer} />
-          <Image source="sf:chevron.right" style={styles.chevron} tintColor={tint} />
-        </Pressable>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-          {EXPLORE_CATEGORIES.map((category) => (
-            <Pressable
-              key={category.id}
-              style={styles.categoryChip}
-              onPress={() => router.push('/search')}
-            >
-              <Image source={FOOD_IMAGE} style={styles.categoryThumb} contentFit="cover" />
-              <ThemedText style={styles.categoryLabel} numberOfLines={1}>
-                {category.label}
-              </ThemedText>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
+      <HorizontalScrollSection
+        title="Explore categories"
+        icon="sf:square.grid.2x2.fill"
+        onPress={() => router.push('/search')}
+        contentContainerStyle={styles.chipRow}
+      >
+        {EXPLORE_CATEGORIES.map((category) => (
+          <Pressable
+            key={category.id}
+            style={styles.categoryChip}
+            onPress={() => {
+              const dishTypeSlug =
+                getDishTypeSlugForQuery(category.id) ??
+                getDishTypeSlugForQuery(category.label);
+              if (dishTypeSlug) {
+                router.push(`/dish-type/${dishTypeSlug}`);
+                return;
+              }
+              router.push('/search');
+            }}
+          >
+            <Image source={FOOD_IMAGE} style={styles.categoryThumb} contentFit="cover" />
+            <ThemedText style={styles.categoryLabel} numberOfLines={1}>
+              {category.label}
+            </ThemedText>
+          </Pressable>
+        ))}
+      </HorizontalScrollSection>
 
-      <View style={styles.section}>
-        <Pressable style={styles.sectionHeader} onPress={() => router.push('/search')}>
-          <Image source="sf:storefront.fill" style={styles.sectionIcon} tintColor={tint} />
-          <ThemedText style={styles.sectionTitle}>Featured stalls nearby</ThemedText>
-          <View style={styles.spacer} />
-          <Image source="sf:chevron.right" style={styles.chevron} tintColor={tint} />
-        </Pressable>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
-          {featuredStalls.map((stall) => (
-            <StallCard
-              key={stall.id}
-              stall={stall}
-              hawkerCenterName={hawkerById.get(stall.hawkerCenterId)?.name}
-              distance={stall.driveTimeMinutes ? `${stall.driveTimeMinutes} min away` : 'Nearby'}
-            />
-          ))}
-        </ScrollView>
-      </View>
+      <HorizontalScrollSection
+        title="Featured stalls nearby"
+        icon="sf:storefront.fill"
+        onPress={() => router.push('/map')}
+        contentContainerStyle={styles.cardRow}
+      >
+        {featuredStalls.map((stall) => (
+          <StallCard
+            key={stall.id}
+            stall={stall}
+            hawkerCenterName={hawkerById.get(stall.hawkerCenterId)?.name}
+          />
+        ))}
+      </HorizontalScrollSection>
 
-      <View style={styles.section}>
-        <Pressable style={styles.sectionHeader} onPress={() => router.push('/search')}>
-          <Image source="sf:heart.fill" style={styles.sectionIcon} tintColor={tint} />
-          <ThemedText style={styles.sectionTitle}>Recommended for you</ThemedText>
-          <View style={styles.spacer} />
-          <Image source="sf:chevron.right" style={styles.chevron} tintColor={tint} />
-        </Pressable>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cardRow}>
-          {recommendedDishes.map((dish) => (
-            <DishCard key={dish.id} dish={dish} />
-          ))}
-        </ScrollView>
-      </View>
+      <HorizontalScrollSection
+        title="Recommended for you"
+        icon="sf:heart.fill"
+        subtitle="Top-rated dishes near your area"
+        onPress={() => router.push('/search')}
+        contentContainerStyle={styles.cardRow}
+      >
+        {recommendedDishes.map((dish) => (
+          <DishCard
+            key={dish.id}
+            dish={dish}
+            attribution={
+              primaryStallNameByDishId.get(dish.id)
+                ? primaryStallNameByDishId.get(dish.id)
+                : undefined
+            }
+          />
+        ))}
+      </HorizontalScrollSection>
 
-      <View style={styles.section}>
-        <Pressable style={styles.sectionHeader} onPress={() => router.push('/search')}>
-          <Image source="sf:flame.fill" style={styles.sectionIcon} tintColor={tint} />
-          <ThemedText style={styles.sectionTitle}>Trending this week</ThemedText>
-          <View style={styles.spacer} />
-          <Image source="sf:chevron.right" style={styles.chevron} tintColor={tint} />
-        </Pressable>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.foodTileRow}>
-          {trendingDishes.map((dish) => (
-            <FoodTile key={dish.id} dish={dish} subtitle={`${dish.rating.toFixed(1)} stars`} />
-          ))}
-        </ScrollView>
-      </View>
+      <HorizontalScrollSection
+        title="Trending this week"
+        icon="sf:flame.fill"
+        subtitle="Most talked-about dishes in the last 7 days"
+        onPress={() => router.push('/search')}
+        contentContainerStyle={styles.foodTileRow}
+      >
+        {trendingDishes.map((dish) => (
+          <FoodTile
+            key={dish.id}
+            dish={dish}
+            attribution={primaryStallNameByDishId.get(dish.id)}
+            subtitle={`${dish.rating.toFixed(1)} stars`}
+          />
+        ))}
+      </HorizontalScrollSection>
     </ScrollView>
   );
 }
@@ -267,41 +290,12 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     gap: 24,
   },
-  topHeader: {
-    paddingHorizontal: 16,
-  },
-  topBarRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 0,
-  },
-  locationIcon: { width: 14, height: 14 },
-  locationLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  locationChevron: { width: 11, height: 11 },
-  profileButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(120,120,128,0.14)',
-  },
-  profileIcon: { width: 21, height: 21 },
   section: { gap: 10 },
   sectionTitleStandalone: {
     fontSize: 24,
-    fontWeight: '800',
     paddingHorizontal: 16,
     lineHeight: 30,
+    textTransform: 'uppercase',
   },
   featuredCarouselContent: {
     paddingHorizontal: 16,
@@ -326,16 +320,6 @@ const styles = StyleSheet.create({
     width: 18,
     backgroundColor: 'rgba(0,122,255,0.9)',
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-  },
-  sectionIcon: { width: 17, height: 17 },
-  sectionTitle: { fontSize: 17, fontWeight: '600' },
-  spacer: { flex: 1 },
-  chevron: { width: 13, height: 13 },
   cardRow: { gap: 16, paddingHorizontal: 16 },
   chipRow: { gap: 10, paddingHorizontal: 16 },
   categoryChip: {
@@ -346,6 +330,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     backgroundColor: 'rgba(120,120,128,0.12)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(120,120,128,0.24)',
   },
   categoryThumb: {
     width: 34,
@@ -358,12 +344,13 @@ const styles = StyleSheet.create({
   },
   foodTileRow: { gap: 12, paddingHorizontal: 16 },
   foodTile: {
-    width: 132,
+    width: 200,
     gap: 8,
   },
   foodTilePressed: { opacity: 0.85 },
   foodTileImage: {
-    width: 150,
+    width: '100%',
+    minWidth: 150,
     height: 132,
     borderRadius: 16,
   },
@@ -371,6 +358,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     // lineHeight: 18,
+  },
+  foodTileByline: {
+    fontSize: 12,
+    opacity: 0.62,
+    lineHeight: 15,
+    marginTop: -2,
+    maxWidth: '100%',
   },
   foodTileMeta: {
     fontSize: 12,

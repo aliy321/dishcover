@@ -280,6 +280,13 @@ export default function DishDetailScreen() {
       {/* Info block */}
       <View style={[s.infoBlock, { backgroundColor: C_BG }]}>
         <ThemedText type="title" style={s.dishName}>{dish.name}</ThemedText>
+        <ThemedText style={[s.dishAttribution, { color: C_ICON }]}>
+          {topStalls.length > 1
+            ? `Available at ${topStalls.length} stalls`
+            : topStalls[0]
+              ? `By ${topStalls[0].name}`
+              : 'Stall info unavailable'}
+        </ThemedText>
 
         <View style={s.metaRow}>
           <View style={s.ratingGroup}>
@@ -455,6 +462,7 @@ const s = StyleSheet.create({
   // ── Info block ──
   infoBlock: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 18, gap: 8 },
   dishName: { fontSize: 28, fontWeight: '800', letterSpacing: -0.5 },
+  dishAttribution: { fontSize: 13, opacity: 0.75, marginTop: -4 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   ratingGroup: { flexDirection: 'row', alignItems: 'center', gap: 5, flex: 1 },
   ratingValue: { fontSize: 15, fontWeight: '700' },

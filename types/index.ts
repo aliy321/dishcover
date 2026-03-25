@@ -26,6 +26,30 @@ export interface Dish {
   stallIds: string[];
 }
 
+// ─── Dish Type + Listing ────────────────────────────────────────────────────
+
+/** Canonical dish category, e.g. "Chicken Rice" */
+export interface DishType {
+  id: string;
+  slug: string;
+  name: string;
+  aliases?: string[];
+  heroPhotoUri?: string | null;
+}
+
+/** Stall-specific dish entry belonging to a DishType */
+export interface DishListing {
+  id: string;
+  dishTypeId: string;
+  dishId: string;
+  stallId: string;
+  name: string;
+  rating: number;
+  reviewCount: number;
+  price: string;
+  photoUri?: string | null;
+}
+
 // ─── Stall ───────────────────────────────────────────────────────────────────
 
 export type PriceRange = '$' | '$$' | '$$$';

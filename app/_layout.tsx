@@ -28,6 +28,7 @@ export default function RootLayout() {
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen name="dish/[id]" options={{ headerShown: false }} />
+                <Stack.Screen name="dish-type/[slug]" options={{ headerShown: false }} />
                 <Stack.Screen name="dish/[id]/reviews" options={{ headerShown: false }} />
                 <Stack.Screen name="stall/[id]" options={{ headerShown: false }} />
                 <Stack.Screen

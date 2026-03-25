@@ -10,20 +10,19 @@ const FALLBACK_IMAGE = require('@/assets/stall.jpg');
 interface StallCardProps {
   stall: Stall;
   hawkerCenterName?: string | null;
-  distance: string;
 }
 
-export function StallCard({ stall, hawkerCenterName, distance }: StallCardProps) {
+export function StallCard({ stall, hawkerCenterName }: StallCardProps) {
   const source = stall.photoUris.length > 0 ? { uri: stall.photoUris[0] } : FALLBACK_IMAGE;
 
   return (
-    <Card source={source} href={`/stall/${stall.id}`}>
+    <Card source={source} href={`/stall/${stall.id}`} elevated={false}>
       <View style={styles.inner}>
         <ThemedText style={styles.name} numberOfLines={1}>
           {stall.name}
         </ThemedText>
         <ThemedText style={styles.meta} numberOfLines={1}>
-          {[hawkerCenterName, distance, stall.priceRange].filter(Boolean).join(' · ')}
+          {[hawkerCenterName, stall.priceRange].filter(Boolean).join(' · ')}
         </ThemedText>
         <View style={styles.ratingRow}>
           <Image source="sf:star.fill" style={styles.starIcon} tintColor="#FFD700" />
@@ -38,25 +37,25 @@ export function StallCard({ stall, hawkerCenterName, distance }: StallCardProps)
 const styles = StyleSheet.create({
   inner: {
     paddingVertical: 2,
-    gap: 4,
+    // gap: 4,
   },
   name: {
     fontSize: 17,
     fontWeight: '700',
     color: '#fff',
     lineHeight: 22,
-    marginBottom: 4,
+    // marginBottom: 4,
   },
   meta: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.7)',
-    marginBottom: 4,
+    // marginBottom: 4,
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    marginTop: 2,
+    // marginTop: 2,
   },
   starIcon: { width: 11, height: 11 },
   rating: { fontSize: 12, color: 'rgba(255,255,255,0.85)' },
