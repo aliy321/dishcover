@@ -1,3 +1,12 @@
+// ─── Award ───────────────────────────────────────────────────────────────────
+
+export interface Award {
+  name: string;
+  year?: number;
+  /** Emoji or short label used as icon, e.g. "🌟" */
+  icon?: string;
+}
+
 // ─── Dish ────────────────────────────────────────────────────────────────────
 
 export interface Dish {
@@ -9,6 +18,10 @@ export interface Dish {
   /** Display price, e.g. "$4" or "$4–$6" */
   price: string;
   photoUri?: string | null;
+  /** Cuisine/characteristic tags, e.g. ["noodles", "spicy", "seafood"] */
+  tags?: string[];
+  /** Notable awards won by this dish */
+  awards?: Award[];
   /** Stall IDs that serve this dish (a dish can appear at multiple stalls) */
   stallIds: string[];
 }
@@ -17,6 +30,7 @@ export interface Dish {
 
 export type PriceRange = '$' | '$$' | '$$$';
 export type OpenStatus = 'open' | 'closed';
+export type VenueType = 'hawker' | 'cafe' | 'buffet' | 'restaurant' | 'food-court';
 
 export interface Stall {
   id: string;
@@ -33,9 +47,14 @@ export interface Stall {
   vibeDescription: string;
   /** Longer "what people are saying" summary shown in the Vibe tab */
   vibeSummary?: string;
+  venueType: VenueType;
   openStatus: OpenStatus;
+  /** Human-readable opening time, e.g. "8:00 AM" */
+  openingTime?: string;
   /** Human-readable closing time, e.g. "10:00 PM" */
   closingTime?: string;
+  /** Notable awards won by this stall */
+  awards?: Award[];
   /** Approximate drive time in minutes from a reference point */
   driveTimeMinutes?: number;
   /** Ordered list of dish IDs that make up this stall's menu */

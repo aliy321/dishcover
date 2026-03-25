@@ -1,9 +1,8 @@
-import { Icon, Label, NativeTabs } from 'expo-router/unstable-native-tabs';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { DynamicColorIOS } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemedView } from '@/components/themed-view';
 
 export default function TabLayout() {
   return (
@@ -31,23 +30,23 @@ export default function TabLayout() {
         })}
       >
         <NativeTabs.Trigger name="index">
-          <Label>Dishcover</Label>
-          <Icon sf={{ default: 'fork.knife', selected: 'fork.knife' }} />
+          <NativeTabs.Trigger.Label>Dishcover</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: 'fork.knife', selected: 'fork.knife' }} />
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="discover">
-          <Label>Explore</Label>
-          <Icon sf={{ default: 'map', selected: 'map.fill' }} />
+        <NativeTabs.Trigger name="map">
+          <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: 'map', selected: 'map.fill' }} />
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="profile">
-          <Label>Profile</Label>
-          <Icon sf={{ default: 'person', selected: 'person.fill' }} />
+        <NativeTabs.Trigger name="roulette">
+          <NativeTabs.Trigger.Label>Surprise</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: 'dice', selected: 'dice.fill' }} />
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="roulette" role="search">
-          <Label>Roulette</Label>
-          <Icon sf={{ default: 'dice', selected: 'dice.fill' }} />
+        <NativeTabs.Trigger name="search" role='search'>
+          <NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf={{ default: 'magnifyingglass', selected: 'magnifyingglass' }} />
         </NativeTabs.Trigger>
 
       </NativeTabs>
