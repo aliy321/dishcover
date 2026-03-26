@@ -1,5 +1,5 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { DynamicColorIOS } from 'react-native';
+import { DynamicColorIOS, Platform } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -10,14 +10,11 @@ export default function TabLayout() {
       backgroundColor: DynamicColorIOS({
         dark: Colors.dark.background,
         light: Colors.light.background,
-      })
+      }),
     }}>
       <NativeTabs
         minimizeBehavior="automatic"
-        backgroundColor={DynamicColorIOS({
-          dark: Colors.dark.background,
-          light: Colors.light.background,
-        })}
+        disableTransparentOnScrollEdge
         labelStyle={{
           color: DynamicColorIOS({
             dark: Colors.dark.text,
@@ -50,6 +47,6 @@ export default function TabLayout() {
         </NativeTabs.Trigger>
 
       </NativeTabs>
-    </SafeAreaProvider>
+    </SafeAreaProvider >
   );
 }
